@@ -180,9 +180,32 @@ def dashboard(db: Session = Depends(get_db)):
     total_customers = db.query(models.Customer).count()
     total_orders = db.query(models.Order).count()
     low_stock = db.query(models.Product).filter(models.Product.quantity < 5).all()
+    
+    # Total sales
+    all_orders = db.query(models.Order).all()
+    total_sales = sum(o.total_amount for o in all_orders)
+    
+    # Top stocked products
+    top_stocked = db.query(models.Product).order_by(models.Product.quantity.desc()).limit(5).all()
+    
+    # Recent orders with customer
+    recent_orders = db.query(models.Order).order_by(models.Order.id.desc()).limit(5).all()
+    recent_orders_data = []
+    for o in recent_orders:
+        customer = db.query(models.Customer).filter(models.Customer.id == o.customer_id).first()
+        recent_orders_data.append({
+            "id": o.id,
+            "customer_name": customer.full_name if customer else "Unknown",
+            "total_amount": o.total_amount,
+            "created_at": o.created_at
+        })
+
     return {
         "total_products": total_products,
         "total_customers": total_customers,
         "total_orders": total_orders,
-        "low_stock_products": low_stock
+        "total_sales": total_sales,
+        "low_stock_products": low_stock,
+        "top_stocked_products": top_stocked,
+        "recent_orders": recent_orders_data
     }

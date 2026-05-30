@@ -173,7 +173,21 @@ tr:hover td { background: #fafafa; }
   color: #94a3b8;
   line-height: 1.4;
 }
-
+.sales-banner {
+  background: linear-gradient(135deg, #e53e3e, #c53030);
+  border-radius: 12px;
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+.sales-banner-left { display: flex; align-items: center; gap: 16px; }
+.sales-banner-icon { width: 48px; height: 48px; background: rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+.sales-banner-label { font-size: 12px; color: rgba(255,255,255,0.8); font-weight: 500; margin-bottom: 4px; }
+.sales-banner-value { font-size: 28px; font-weight: 800; color: white; }
+.dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
 @media (max-width: 768px) {
   .sidebar { display: none; }
   .main-content { margin-left: 0; }
