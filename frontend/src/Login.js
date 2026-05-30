@@ -24,45 +24,15 @@ export default function Login({ onLogin }) {
       <div className="login-left">
         <div className="login-brand">
           <Package size={48} color="white" style={{marginBottom:16}}/>
-          <h1>StockFlow Pro</h1>
-          <p>Smart inventory management for modern businesses</p>
-        </div>
-        <div className="login-features">
-          <div className="login-feature">
-            <span className="lf-icon">📈</span>
-            <div>
-              <strong>Real-Time Stock Tracking</strong>
-              <p>Monitor inventory levels instantly across all products</p>
-            </div>
-          </div>
-          <div className="login-feature">
-            <span className="lf-icon">🧾</span>
-            <div>
-              <strong>Order Management</strong>
-              <p>Create, track and manage customer orders seamlessly</p>
-            </div>
-          </div>
-          <div className="login-feature">
-            <span className="lf-icon">👤</span>
-            <div>
-              <strong>Customer Database</strong>
-              <p>Maintain a complete record of all your customers</p>
-            </div>
-          </div>
-          <div className="login-feature">
-            <span className="lf-icon">📊</span>
-            <div>
-              <strong>Business Dashboard</strong>
-              <p>Get a bird's eye view of your entire business</p>
-            </div>
-          </div>
+          <h1>Inventory & Order Management System</h1>
+          <p>Manage your business smarter and faster</p>
         </div>
       </div>
 
       <div className="login-right">
         <div className="login-box">
           <h2>Welcome back</h2>
-          <p className="login-sub">Sign in to your StockFlow account</p>
+          <p className="login-sub">Sign in to your account</p>
 
           {error && <div className="msg error">❌ {error}</div>}
 
@@ -94,8 +64,8 @@ export default function Login({ onLogin }) {
           <div className="login-hint">
             <span style={{color:'#374151', fontWeight:600}}>Demo Credentials</span>
             <span style={{color:'#64748b', fontSize:12}}> (use these for testing)</span>
-            <code style={{color:'#111', marginTop:6, display:'block'}}>📧 admin@inventory.com</code>
-            <code style={{color:'#111', display:'block'}}>🔑 admin123</code>
+            <code style={{color:'#111', marginTop:6, display:'block'}}>admin@inventory.com</code>
+            <code style={{color:'#111', display:'block'}}>admin123</code>
           </div>
         </div>
       </div>
