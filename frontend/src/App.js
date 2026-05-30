@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { LayoutDashboard, Package, Users, ShoppingCart, LogOut, Bell, Settings, ChevronDown } from 'lucide-react';
 import Dashboard from './pages/Dashboard';
 import Products from './pages/Products';
 import Customers from './pages/Customers';
@@ -10,10 +11,10 @@ import './App.css';
 function Layout({ onLogout }) {
   const location = useLocation();
   const navItems = [
-    { path: '/', icon: '📊', label: 'Dashboard' },
-    { path: '/products', icon: '📦', label: 'Inventory' },
-    { path: '/customers', icon: '👥', label: 'Customers' },
-    { path: '/orders', icon: '🛒', label: 'Sales Orders' },
+    { path: '/', icon: <LayoutDashboard size={18}/>, label: 'Dashboard' },
+    { path: '/products', icon: <Package size={18}/>, label: 'Inventory' },
+    { path: '/customers', icon: <Users size={18}/>, label: 'Customers' },
+    { path: '/orders', icon: <ShoppingCart size={18}/>, label: 'Sales Orders' },
   ];
 
   const pageTitles = {
@@ -27,7 +28,7 @@ function Layout({ onLogout }) {
     <div className="app-layout">
       <aside className="sidebar">
         <div className="sidebar-brand">
-          <span>📦</span>
+          <span className="sidebar-brand-icon">📦</span>
           <span>Inventory Pro</span>
         </div>
         <div className="sidebar-nav">
@@ -45,7 +46,7 @@ function Layout({ onLogout }) {
         </div>
         <div className="sidebar-bottom">
           <button className="sidebar-logout" onClick={onLogout}>
-            <span className="sidebar-icon">🚪</span>
+            <span className="sidebar-icon"><LogOut size={18}/></span>
             <span>Logout</span>
           </button>
         </div>
@@ -57,9 +58,12 @@ function Layout({ onLogout }) {
             <span className="topbar-title">{pageTitles[location.pathname] || 'Inventory Pro'}</span>
           </div>
           <div className="topbar-right">
+            <Bell size={20} color="#64748b" style={{cursor:'pointer'}}/>
+            <Settings size={20} color="#64748b" style={{cursor:'pointer'}}/>
             <div className="topbar-user">
               <div className="topbar-avatar">A</div>
               <span>Admin</span>
+              <ChevronDown size={14} color="#64748b"/>
             </div>
           </div>
         </div>
