@@ -44,11 +44,9 @@ export default function Products() {
     setMsg(null);
   };
 
-  const del = async (id) => {
-    if (window.confirm('Delete this product?')) {
-      await API.delete(`/products/${id}`);
-      load();
-    }
+const del = async (id) => {
+    await API.delete(`/products/${id}`);
+    load();
   };
 
   return (
