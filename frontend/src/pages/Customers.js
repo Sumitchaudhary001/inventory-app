@@ -10,6 +10,12 @@ export default function Customers() {
   useEffect(() => { load(); }, []);
 
   const submit = async () => {
+
+    if (!form.full_name) { setMsg({ type: 'error', text: '❌ Full name is required' }); return; }
+    if (!form.email) { setMsg({ type: 'error', text: '❌ Email is required' }); return; }
+    if (!form.email.includes('@')) { setMsg({ type: 'error', text: '❌ Please enter a valid email' }); return; }
+    if (!form.phone) { setMsg({ type: 'error', text: '❌ Phone number is required' }); return; }
+    
     try {
       await API.post('/customers', form);
       setMsg({ type: 'success', text: 'Customer added!' });
