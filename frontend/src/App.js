@@ -11,10 +11,17 @@ function Layout({ onLogout }) {
   const location = useLocation();
   const navItems = [
     { path: '/', icon: '📊', label: 'Dashboard' },
-    { path: '/products', icon: '📦', label: 'Products' },
+    { path: '/products', icon: '📦', label: 'Inventory' },
     { path: '/customers', icon: '👥', label: 'Customers' },
-    { path: '/orders', icon: '🛒', label: 'Orders' },
+    { path: '/orders', icon: '🛒', label: 'Sales Orders' },
   ];
+
+  const pageTitles = {
+    '/': 'Dashboard',
+    '/products': 'Inventory',
+    '/customers': 'Customers',
+    '/orders': 'Sales Orders',
+  };
 
   return (
     <div className="app-layout">
@@ -23,7 +30,8 @@ function Layout({ onLogout }) {
           <span>📦</span>
           <span>Inventory Pro</span>
         </div>
-        <nav className="sidebar-nav">
+        <div className="sidebar-nav">
+          <div className="sidebar-section">Main Menu</div>
           {navItems.map(item => (
             <Link
               key={item.path}
@@ -34,19 +42,36 @@ function Layout({ onLogout }) {
               <span>{item.label}</span>
             </Link>
           ))}
-        </nav>
-        <button className="sidebar-logout" onClick={onLogout}>
-          🚪 Logout
-        </button>
+        </div>
+        <div className="sidebar-bottom">
+          <button className="sidebar-logout" onClick={onLogout}>
+            <span className="sidebar-icon">🚪</span>
+            <span>Logout</span>
+          </button>
+        </div>
       </aside>
 
       <main className="main-content">
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/products" element={<Products />} />
-          <Route path="/customers" element={<Customers />} />
-          <Route path="/orders" element={<Orders />} />
-        </Routes>
+        <div className="topbar">
+          <div className="topbar-left">
+            <span className="topbar-title">{pageTitles[location.pathname] || 'Inventory Pro'}</span>
+          </div>
+          <div className="topbar-right">
+            <div className="topbar-user">
+              <div className="topbar-avatar">A</div>
+              <span>Admin</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="page-content">
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/products" element={<Products />} />
+            <Route path="/customers" element={<Customers />} />
+            <Route path="/orders" element={<Orders />} />
+          </Routes>
+        </div>
       </main>
 
       <nav className="bottom-nav">
@@ -67,9 +92,7 @@ function Layout({ onLogout }) {
 
 export default function App() {
   const [loggedIn, setLoggedIn] = useState(false);
-
   if (!loggedIn) return <Login onLogin={() => setLoggedIn(true)} />;
-
   return (
     <BrowserRouter>
       <Layout onLogout={() => setLoggedIn(false)} />
