@@ -61,7 +61,7 @@ export default function Products() {
       <p className="page-sub">Manage your product inventory</p>
 
       <div className="form-box">
-        <h2>{editId ? '✏️ Edit Product' : '➕ Add New Product'}</h2>
+        <h2>{editId ? 'Edit Product' : '➕ Add New Product'}</h2>
         {msg && <div className={`msg ${msg.type}`}>{msg.text}</div>}
         <div className="form-grid">
           <input placeholder="Product Name *" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
@@ -98,7 +98,7 @@ export default function Products() {
         </div>
         {filtered.length === 0 ? (
           <div className="empty">
-            <div className="empty-icon">📦</div>
+            <div className="empty-icon"></div>
             <p>{search ? 'No products match your search' : 'No products yet. Add your first product above!'}</p>
           </div>
         ) : (
@@ -124,8 +124,8 @@ export default function Products() {
                     </span>
                   </td>
                   <td>
-                    <button className="btn-edit" onClick={() => startEdit(p)}>✏️ Edit</button>
-                    <button className="btn-delete" onClick={() => del(p.id)}>🗑️ Delete</button>
+                    <button className="btn-edit" onClick={() => startEdit(p)}> Edit</button>
+                    <button className="btn-delete" onClick={() => del(p.id)}> Delete</button>
                   </td>
                 </tr>
               ))}

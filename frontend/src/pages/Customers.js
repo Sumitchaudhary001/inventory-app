@@ -74,7 +74,7 @@ export default function Customers() {
         </div>
         {filtered.length === 0 ? (
           <div className="empty">
-            <div className="empty-icon">👥</div>
+            <div className="empty-icon"></div>
             <p>{search ? 'No customers match your search' : 'No customers yet. Add one above!'}</p>
           </div>
         ) : (
@@ -93,12 +93,12 @@ export default function Customers() {
                   <td><strong>{c.full_name}</strong></td>
                   <td>{c.email}</td>
                   <td>{c.phone}</td>
-                  <td><button className="btn-delete" onClick={() => del(c.id)}>🗑️ Delete</button></td>
+                  <td><button className="btn-delete" onClick={() => del(c.id)}>Delete</button></td>
                 </tr>
               ))}
             </tbody>
           </table>
-        )}
+        )} 
       </div>
     </div>
   );

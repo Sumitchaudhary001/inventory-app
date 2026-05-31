@@ -240,7 +240,7 @@ export default function Orders() {
                   <p style={{fontSize:12, color:'rgba(255,255,255,0.6)', marginBottom:3}}>TOTAL AMOUNT</p>
                   <p style={{fontSize:24, fontWeight:800, color:'white'}}>₹{selectedOrder.total_amount}</p>
                 </div>
-                <div style={{fontSize:32}}>🧾</div>
+                <div style={{fontSize:32}}></div>
               </div>
 
             </div>
@@ -256,7 +256,7 @@ export default function Orders() {
             <button
               onClick={() => exportCSV(filtered, getCustomerName)}
               style={{background:'#f1f5f9', color:'#0f172a', border:'none', padding:'6px 14px', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer', display:'flex', alignItems:'center', gap:6}}>
-              ⬇️ Export CSV
+              Export CSV
             </button>
           </div>
         </div>
@@ -304,7 +304,7 @@ export default function Orders() {
                     </td>
                     <td>{new Date(o.created_at).toLocaleDateString('en-IN')}</td>
                     <td>
-                      <button className="btn-edit" onClick={() => viewDetails(o.id)}>👁️ Details</button>
+                      <button className="btn-edit" onClick={() => viewDetails(o.id)}> Details</button>
                       <button className="btn-delete" onClick={() => del(o.id)}>Cancel</button>
                     </td>
                   </tr>
