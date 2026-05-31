@@ -5,7 +5,7 @@ A production-ready full-stack web application for managing inventory, customers,
 ---
 
 Live Demo
-
+NOTE: IT MAY TAKE A WHILE TO LOAD THE APPLICATION
 Frontend: https://inventory-app-psi-orpin.vercel.app
 Backend API: https://inventory-backend-um42.onrender.com
 API Documentation: https://inventory-backend-um42.onrender.com/docs
