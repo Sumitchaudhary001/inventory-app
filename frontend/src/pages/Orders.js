@@ -154,47 +154,95 @@ export default function Orders() {
         </div>
       </div>
 
+      {/* Invoice Modal */}
       {selectedOrder && (
-        <div style={{position:'fixed', top:0, left:0, right:0, bottom:0, background:'rgba(0,0,0,0.5)', zIndex:200, display:'flex', alignItems:'center', justifyContent:'center'}}
+        <div style={{position:'fixed', top:0, left:0, right:0, bottom:0, background:'rgba(0,0,0,0.5)', zIndex:200, display:'flex', alignItems:'center', justifyContent:'center', padding:16}}
           onClick={() => setSelectedOrder(null)}>
-          <div style={{background:'white', borderRadius:16, padding:32, width:'90%', maxWidth:500}}
+          <div style={{background:'white', borderRadius:16, width:'90%', maxWidth:520, maxHeight:'90vh', overflowY:'auto'}}
             onClick={e => e.stopPropagation()}>
-            <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:20}}>
-              <h2 style={{fontSize:18, fontWeight:700}}>Order #{selectedOrder.id}</h2>
-              <button onClick={() => setSelectedOrder(null)}
-                style={{background:'#f1f5f9', border:'none', padding:'6px 12px', borderRadius:8, cursor:'pointer', fontWeight:700}}>✕</button>
-            </div>
-            <div style={{background:'#f8fafc', borderRadius:10, padding:16, marginBottom:16}}>
-              <p style={{fontSize:12, color:'#64748b', marginBottom:4, fontWeight:600}}>CUSTOMER</p>
-              <p style={{fontWeight:600}}>{getCustomerName(selectedOrder.customer_id)}</p>
-            </div>
-            <div style={{background:'#f8fafc', borderRadius:10, padding:16, marginBottom:16}}>
-              <p style={{fontSize:12, color:'#64748b', marginBottom:10, fontWeight:600}}>UPDATE STATUS</p>
-              <div style={{display:'flex', gap:8, flexWrap:'wrap'}}>
-                {['Pending', 'Confirmed', 'Shipped', 'Delivered'].map(s => (
-                  <button key={s} onClick={() => updateStatus(selectedOrder.id, s)}
-                    style={{
-                      padding:'7px 16px', borderRadius:20,
-                      border: `1.5px solid ${STATUS_COLORS[s].border}`,
-                      background: selectedOrder.status === s ? STATUS_COLORS[s].bg : 'white',
-                      color: STATUS_COLORS[s].color,
-                      fontWeight:600, fontSize:13, cursor:'pointer'
-                    }}>{s}</button>
-                ))}
+
+            {/* Invoice Header */}
+            <div style={{background:'#1a1a2e', borderRadius:'16px 16px 0 0', padding:'24px 28px', color:'white'}}>
+              <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
+                <div>
+                  <p style={{fontSize:11, color:'rgba(255,255,255,0.6)', fontWeight:600, letterSpacing:1, marginBottom:4}}>INVOICE</p>
+                  <h2 style={{fontSize:22, fontWeight:700}}>Order #{selectedOrder.id}</h2>
+                </div>
+                <button onClick={() => setSelectedOrder(null)}
+                  style={{background:'rgba(255,255,255,0.1)', border:'none', padding:'8px 12px', borderRadius:8, cursor:'pointer', color:'white', fontWeight:700}}>✕</button>
+              </div>
+              <div style={{marginTop:16, display:'flex', gap:24}}>
+                <div>
+                  <p style={{fontSize:11, color:'rgba(255,255,255,0.5)', marginBottom:3}}>DATE</p>
+                  <p style={{fontSize:13, color:'white', fontWeight:500}}>{new Date(selectedOrder.created_at).toLocaleDateString('en-IN', {day:'numeric', month:'long', year:'numeric'})}</p>
+                </div>
+                <div>
+                  <p style={{fontSize:11, color:'rgba(255,255,255,0.5)', marginBottom:3}}>STATUS</p>
+                  <span style={{
+                    fontSize:12, fontWeight:600, padding:'3px 10px', borderRadius:20,
+                    background: STATUS_COLORS[selectedOrder.status || 'Pending']?.bg,
+                    color: STATUS_COLORS[selectedOrder.status || 'Pending']?.color
+                  }}>{selectedOrder.status || 'Pending'}</span>
+                </div>
               </div>
             </div>
-            <div style={{background:'#f8fafc', borderRadius:10, padding:16, marginBottom:16}}>
-              <p style={{fontSize:12, color:'#64748b', marginBottom:8, fontWeight:600}}>ITEMS</p>
-              {(selectedOrder.items || []).map((item, i) => (
-                <div key={i} style={{display:'flex', justifyContent:'space-between', padding:'8px 0', borderBottom:'1px solid #e2e8f0'}}>
-                  <span style={{fontSize:14}}>{getProductName(item.product_id)}</span>
-                  <span style={{color:'#64748b', fontSize:14}}>x{item.quantity} — ₹{item.unit_price * item.quantity}</span>
+
+            <div style={{padding:'24px 28px'}}>
+
+              {/* Customer Info */}
+              <div style={{background:'#f8fafc', borderRadius:10, padding:16, marginBottom:20}}>
+                <p style={{fontSize:11, color:'#64748b', fontWeight:700, letterSpacing:0.5, marginBottom:8}}>BILLED TO</p>
+                <p style={{fontWeight:700, fontSize:15, color:'#0f172a'}}>{getCustomerName(selectedOrder.customer_id)}</p>
+              </div>
+
+              {/* Update Status */}
+              <div style={{marginBottom:20}}>
+                <p style={{fontSize:11, color:'#64748b', fontWeight:700, letterSpacing:0.5, marginBottom:10}}>UPDATE STATUS</p>
+                <div style={{display:'flex', gap:8, flexWrap:'wrap'}}>
+                  {['Pending', 'Confirmed', 'Shipped', 'Delivered'].map(s => (
+                    <button key={s} onClick={() => updateStatus(selectedOrder.id, s)}
+                      style={{
+                        padding:'7px 16px', borderRadius:20,
+                        border: `1.5px solid ${STATUS_COLORS[s].border}`,
+                        background: selectedOrder.status === s ? STATUS_COLORS[s].bg : 'white',
+                        color: STATUS_COLORS[s].color,
+                        fontWeight:600, fontSize:13, cursor:'pointer'
+                      }}>{s}</button>
+                  ))}
                 </div>
-              ))}
-            </div>
-            <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 0'}}>
-              <span style={{fontWeight:600, fontSize:15}}>Total Amount</span>
-              <span style={{fontWeight:700, fontSize:22, color:'#0f172a'}}>₹{selectedOrder.total_amount}</span>
+              </div>
+
+              {/* Items Table */}
+              <div style={{marginBottom:20}}>
+                <p style={{fontSize:11, color:'#64748b', fontWeight:700, letterSpacing:0.5, marginBottom:10}}>ORDER ITEMS</p>
+                <div style={{border:'1px solid #f1f5f9', borderRadius:10, overflow:'hidden'}}>
+                  <div style={{display:'grid', gridTemplateColumns:'1fr auto auto', background:'#f8fafc', padding:'10px 16px', gap:16}}>
+                    <span style={{fontSize:12, fontWeight:600, color:'#64748b'}}>PRODUCT</span>
+                    <span style={{fontSize:12, fontWeight:600, color:'#64748b'}}>QTY</span>
+                    <span style={{fontSize:12, fontWeight:600, color:'#64748b'}}>AMOUNT</span>
+                  </div>
+                  {(selectedOrder.items || []).map((item, i) => (
+                    <div key={i} style={{display:'grid', gridTemplateColumns:'1fr auto auto', padding:'12px 16px', gap:16, borderTop:'1px solid #f1f5f9', alignItems:'center'}}>
+                      <div>
+                        <p style={{fontSize:14, fontWeight:600, color:'#0f172a'}}>{getProductName(item.product_id)}</p>
+                        <p style={{fontSize:12, color:'#94a3b8'}}>₹{item.unit_price} per unit</p>
+                      </div>
+                      <span style={{fontSize:14, color:'#374151', textAlign:'center'}}>×{item.quantity}</span>
+                      <span style={{fontSize:14, fontWeight:600, color:'#0f172a'}}>₹{item.unit_price * item.quantity}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Total */}
+              <div style={{background:'#1a1a2e', borderRadius:10, padding:'16px 20px', display:'flex', justifyContent:'space-between', alignItems:'center'}}>
+                <div>
+                  <p style={{fontSize:12, color:'rgba(255,255,255,0.6)', marginBottom:3}}>TOTAL AMOUNT</p>
+                  <p style={{fontSize:24, fontWeight:800, color:'white'}}>₹{selectedOrder.total_amount}</p>
+                </div>
+                <div style={{fontSize:32}}>🧾</div>
+              </div>
+
             </div>
           </div>
         </div>
@@ -208,7 +256,7 @@ export default function Orders() {
             <button
               onClick={() => exportCSV(filtered, getCustomerName)}
               style={{background:'#f1f5f9', color:'#0f172a', border:'none', padding:'6px 14px', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer', display:'flex', alignItems:'center', gap:6}}>
-              Export CSV
+              ⬇️ Export CSV
             </button>
           </div>
         </div>
