@@ -23,6 +23,7 @@ class Order(Base):
     id = Column(Integer, primary_key=True, index=True)
     customer_id = Column(Integer, ForeignKey("customers.id"), nullable=False)
     total_amount = Column(Float, default=0)
+    status = Column(String, default="Pending")
     created_at = Column(DateTime, default=datetime.utcnow)
     customer = relationship("Customer")
     items = relationship("OrderItem", back_populates="order")

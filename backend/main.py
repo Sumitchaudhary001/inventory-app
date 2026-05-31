@@ -117,6 +117,22 @@ def get_customer(id: int, db: Session = Depends(get_db)):
         raise HTTPException(404, "Customer not found")
     return customer
 
+class OrderStatusUpdate(BaseModel):
+    status: str
+
+@app.put("/orders/{id}/status")
+def update_order_status(id: int, data: OrderStatusUpdate, db: Session = Depends(get_db)):
+    order = db.query(models.Order).filter(models.Order.id == id).first()
+    if not order:
+        raise HTTPException(404, "Order not found")
+    valid_statuses = ["Pending", "Confirmed", "Shipped", "Delivered"]
+    if data.status not in valid_statuses:
+        raise HTTPException(400, f"Status must be one of {valid_statuses}")
+    order.status = data.status
+    db.commit()
+    db.refresh(order)
+    return order
+
 @app.delete("/customers/{id}")
 def delete_customer(id: int, db: Session = Depends(get_db)):
     customer = db.query(models.Customer).filter(models.Customer.id == id).first()

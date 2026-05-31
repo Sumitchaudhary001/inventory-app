@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import API from '../api';
 
+const STATUS_COLORS = {
+  Pending:   { bg: '#fff7ed', color: '#c2410c', border: '#fed7aa' },
+  Confirmed: { bg: '#eff6ff', color: '#1d4ed8', border: '#bfdbfe' },
+  Shipped:   { bg: '#f0fdf4', color: '#15803d', border: '#bbf7d0' },
+  Delivered: { bg: '#f0fdf4', color: '#166534', border: '#86efac' },
+};
+
 export default function Orders() {
   const [orders, setOrders] = useState([]);
   const [customers, setCustomers] = useState([]);
@@ -51,9 +58,25 @@ export default function Orders() {
 
   const del = async (id) => {
     if (window.confirm('Cancel this order?')) {
-      await API.delete(`/orders/${id}`);
-      if (selectedOrder?.id === id) setSelectedOrder(null);
+      try {
+        await API.delete(`/orders/${id}`);
+        if (selectedOrder?.id === id) setSelectedOrder(null);
+        load();
+      } catch (e) {
+        setMsg({ type: 'error', text: '❌ ' + (e.response?.data?.detail || 'Error') });
+      }
+    }
+  };
+
+  const updateStatus = async (id, status) => {
+    try {
+      await API.put(`/orders/${id}/status`, { status });
       load();
+      if (selectedOrder?.id === id) {
+        setSelectedOrder({ ...selectedOrder, status });
+      }
+    } catch (e) {
+      setMsg({ type: 'error', text: '❌ Failed to update status' });
     }
   };
 
@@ -74,7 +97,7 @@ export default function Orders() {
 
   return (
     <div>
-      <h1 className="page-title">Orders</h1>
+      <h1 className="page-title">Sales Orders</h1>
       <p className="page-sub">Create and manage customer orders</p>
 
       <div className="form-box">
@@ -115,29 +138,55 @@ export default function Orders() {
       {selectedOrder && (
         <div style={{position:'fixed', top:0, left:0, right:0, bottom:0, background:'rgba(0,0,0,0.5)', zIndex:200, display:'flex', alignItems:'center', justifyContent:'center'}}
           onClick={() => setSelectedOrder(null)}>
-          <div style={{background:'white', borderRadius:16, padding:32, width:'90%', maxWidth:480}}
+          <div style={{background:'white', borderRadius:16, padding:32, width:'90%', maxWidth:500}}
             onClick={e => e.stopPropagation()}>
             <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:20}}>
-              <h2 style={{fontSize:18, fontWeight:700}}>Order #{selectedOrder.id} Details</h2>
+              <h2 style={{fontSize:18, fontWeight:700}}>Order #{selectedOrder.id}</h2>
               <button onClick={() => setSelectedOrder(null)}
                 style={{background:'#f1f5f9', border:'none', padding:'6px 12px', borderRadius:8, cursor:'pointer', fontWeight:700}}>✕</button>
             </div>
+
             <div style={{background:'#f8fafc', borderRadius:10, padding:16, marginBottom:16}}>
-              <p style={{fontSize:13, color:'#64748b', marginBottom:4}}>CUSTOMER</p>
+              <p style={{fontSize:12, color:'#64748b', marginBottom:4, fontWeight:600}}>CUSTOMER</p>
               <p style={{fontWeight:600}}>{getCustomerName(selectedOrder.customer_id)}</p>
             </div>
+
+            {/* Status update */}
             <div style={{background:'#f8fafc', borderRadius:10, padding:16, marginBottom:16}}>
-              <p style={{fontSize:13, color:'#64748b', marginBottom:8}}>ITEMS</p>
-              {selectedOrder.items?.map((item, i) => (
-                <div key={i} style={{display:'flex', justifyContent:'space-between', padding:'6px 0', borderBottom:'1px solid #e2e8f0'}}>
-                  <span>{getProductName(item.product_id)}</span>
-                  <span style={{color:'#64748b'}}>x{item.quantity} — ₹{item.unit_price * item.quantity}</span>
+              <p style={{fontSize:12, color:'#64748b', marginBottom:10, fontWeight:600}}>UPDATE STATUS</p>
+              <div style={{display:'flex', gap:8, flexWrap:'wrap'}}>
+                {['Pending', 'Confirmed', 'Shipped', 'Delivered'].map(s => (
+                  <button key={s} onClick={() => updateStatus(selectedOrder.id, s)}
+                    style={{
+                      padding:'7px 16px',
+                      borderRadius:20,
+                      border: `1.5px solid ${STATUS_COLORS[s].border}`,
+                      background: selectedOrder.status === s ? STATUS_COLORS[s].bg : 'white',
+                      color: STATUS_COLORS[s].color,
+                      fontWeight:600,
+                      fontSize:13,
+                      cursor:'pointer',
+                      transition:'all 0.15s'
+                    }}>
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div style={{background:'#f8fafc', borderRadius:10, padding:16, marginBottom:16}}>
+              <p style={{fontSize:12, color:'#64748b', marginBottom:8, fontWeight:600}}>ITEMS</p>
+              {(selectedOrder.items || []).map((item, i) => (
+                <div key={i} style={{display:'flex', justifyContent:'space-between', padding:'8px 0', borderBottom:'1px solid #e2e8f0'}}>
+                  <span style={{fontSize:14}}>{getProductName(item.product_id)}</span>
+                  <span style={{color:'#64748b', fontSize:14}}>x{item.quantity} — ₹{item.unit_price * item.quantity}</span>
                 </div>
               ))}
             </div>
-            <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
-              <span style={{fontWeight:600, fontSize:16}}>Total</span>
-              <span style={{fontWeight:700, fontSize:20, color:'#0f172a'}}>₹{selectedOrder.total_amount}</span>
+
+            <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 0'}}>
+              <span style={{fontWeight:600, fontSize:15}}>Total Amount</span>
+              <span style={{fontWeight:700, fontSize:22, color:'#0f172a'}}>₹{selectedOrder.total_amount}</span>
             </div>
           </div>
         </div>
@@ -160,23 +209,39 @@ export default function Orders() {
                 <th>Order ID</th>
                 <th>Customer</th>
                 <th>Total</th>
+                <th>Status</th>
                 <th>Date</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {orders.map(o => (
-                <tr key={o.id}>
-                  <td><span className="badge badge-blue">#{o.id}</span></td>
-                  <td>{getCustomerName(o.customer_id)}</td>
-                  <td><strong>₹{o.total_amount}</strong></td>
-                  <td>{new Date(o.created_at).toLocaleDateString('en-IN')}</td>
-                  <td>
-                    <button className="btn-edit" onClick={() => viewDetails(o.id)}>👁️ Details</button>
-                    <button className="btn-delete" onClick={() => del(o.id)}>Cancel</button>
-                  </td>
-                </tr>
-              ))}
+              {orders.map(o => {
+                const s = o.status || 'Pending';
+                const sc = STATUS_COLORS[s] || STATUS_COLORS.Pending;
+                return (
+                  <tr key={o.id}>
+                    <td><span className="badge badge-blue">#{o.id}</span></td>
+                    <td><strong>{getCustomerName(o.customer_id)}</strong></td>
+                    <td><strong>₹{o.total_amount}</strong></td>
+                    <td>
+                      <span style={{
+                        background: sc.bg,
+                        color: sc.color,
+                        border: `1px solid ${sc.border}`,
+                        padding:'3px 10px',
+                        borderRadius:20,
+                        fontSize:12,
+                        fontWeight:600
+                      }}>{s}</span>
+                    </td>
+                    <td>{new Date(o.created_at).toLocaleDateString('en-IN')}</td>
+                    <td>
+                      <button className="btn-edit" onClick={() => viewDetails(o.id)}>👁️ Details</button>
+                      <button className="btn-delete" onClick={() => del(o.id)}>Cancel</button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}
