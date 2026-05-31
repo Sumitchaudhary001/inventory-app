@@ -208,7 +208,7 @@ export default function Orders() {
             <button
               onClick={() => exportCSV(filtered, getCustomerName)}
               style={{background:'#f1f5f9', color:'#0f172a', border:'none', padding:'6px 14px', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer', display:'flex', alignItems:'center', gap:6}}>
-              ⬇️ Export CSV
+              Export CSV
             </button>
           </div>
         </div>
