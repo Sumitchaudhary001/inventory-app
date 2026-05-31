@@ -6,6 +6,7 @@ export default function Products() {
   const [form, setForm] = useState({ name: '', sku: '', price: '', quantity: '' });
   const [editId, setEditId] = useState(null);
   const [msg, setMsg] = useState(null);
+  const [search, setSearch] = useState('');
 
   const load = () => API.get('/products').then(r => setProducts(r.data));
   useEffect(() => { load(); }, []);
@@ -44,14 +45,19 @@ export default function Products() {
     setMsg(null);
   };
 
-const del = async (id) => {
+  const del = async (id) => {
     await API.delete(`/products/${id}`);
     load();
   };
 
+  const filtered = products.filter(p =>
+    p.name.toLowerCase().includes(search.toLowerCase()) ||
+    p.sku.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <div>
-      <h1 className="page-title">Products</h1>
+      <h1 className="page-title">Inventory</h1>
       <p className="page-sub">Manage your product inventory</p>
 
       <div className="form-box">
@@ -80,12 +86,20 @@ const del = async (id) => {
       <div className="table-box">
         <div className="table-header">
           <h2>All Products</h2>
-          <span className="table-count">{products.length} items</span>
+          <span className="table-count">{filtered.length} items</span>
         </div>
-        {products.length === 0 ? (
+        <div style={{padding:'12px 20px', borderBottom:'1px solid #f1f5f9'}}>
+          <input
+            placeholder="🔍 Search by name or SKU..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            style={{width:'100%', maxWidth:400, padding:'9px 14px', border:'1.5px solid #e2e8f0', borderRadius:8, fontSize:14, background:'#f8fafc'}}
+          />
+        </div>
+        {filtered.length === 0 ? (
           <div className="empty">
             <div className="empty-icon">📦</div>
-            <p>No products yet. Add your first product above!</p>
+            <p>{search ? 'No products match your search' : 'No products yet. Add your first product above!'}</p>
           </div>
         ) : (
           <table>
@@ -99,7 +113,7 @@ const del = async (id) => {
               </tr>
             </thead>
             <tbody>
-              {products.map(p => (
+              {filtered.map(p => (
                 <tr key={p.id}>
                   <td><strong>{p.name}</strong></td>
                   <td><span className="badge badge-blue">{p.sku}</span></td>

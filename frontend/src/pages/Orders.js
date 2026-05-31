@@ -16,6 +16,7 @@ export default function Orders() {
   const [items, setItems] = useState([{ product_id: '', quantity: 1 }]);
   const [msg, setMsg] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [search, setSearch] = useState('');
 
   const load = () => API.get('/orders').then(r => setOrders(r.data));
   useEffect(() => {
@@ -72,9 +73,7 @@ export default function Orders() {
     try {
       await API.put(`/orders/${id}/status`, { status });
       load();
-      if (selectedOrder?.id === id) {
-        setSelectedOrder({ ...selectedOrder, status });
-      }
+      if (selectedOrder?.id === id) setSelectedOrder({ ...selectedOrder, status });
     } catch (e) {
       setMsg({ type: 'error', text: '❌ Failed to update status' });
     }
@@ -95,6 +94,10 @@ export default function Orders() {
     return p ? p.name : `Product #${id}`;
   };
 
+  const filtered = orders.filter(o =>
+    getCustomerName(o.customer_id).toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <div>
       <h1 className="page-title">Sales Orders</h1>
@@ -103,7 +106,6 @@ export default function Orders() {
       <div className="form-box">
         <h2>🛒 Create New Order</h2>
         {msg && <div className={`msg ${msg.type}`}>{msg.text}</div>}
-
         <select value={customerId} onChange={e => setCustomerId(e.target.value)}
           style={{width:'100%', padding:'11px 14px', border:'1.5px solid #e2e8f0', borderRadius:10, fontSize:14, marginBottom:16, background:'#f8fafc', color:'#0f172a'}}>
           <option value="">Select Customer *</option>
@@ -127,7 +129,6 @@ export default function Orders() {
             )}
           </div>
         ))}
-
         <div style={{display:'flex', gap:8, marginTop:12}}>
           <button className="btn-secondary" onClick={addItem}>+ Add Item</button>
           <button className="btn-primary" onClick={submit}>Place Order</button>
@@ -145,35 +146,25 @@ export default function Orders() {
               <button onClick={() => setSelectedOrder(null)}
                 style={{background:'#f1f5f9', border:'none', padding:'6px 12px', borderRadius:8, cursor:'pointer', fontWeight:700}}>✕</button>
             </div>
-
             <div style={{background:'#f8fafc', borderRadius:10, padding:16, marginBottom:16}}>
               <p style={{fontSize:12, color:'#64748b', marginBottom:4, fontWeight:600}}>CUSTOMER</p>
               <p style={{fontWeight:600}}>{getCustomerName(selectedOrder.customer_id)}</p>
             </div>
-
-            {/* Status update */}
             <div style={{background:'#f8fafc', borderRadius:10, padding:16, marginBottom:16}}>
               <p style={{fontSize:12, color:'#64748b', marginBottom:10, fontWeight:600}}>UPDATE STATUS</p>
               <div style={{display:'flex', gap:8, flexWrap:'wrap'}}>
                 {['Pending', 'Confirmed', 'Shipped', 'Delivered'].map(s => (
                   <button key={s} onClick={() => updateStatus(selectedOrder.id, s)}
                     style={{
-                      padding:'7px 16px',
-                      borderRadius:20,
+                      padding:'7px 16px', borderRadius:20,
                       border: `1.5px solid ${STATUS_COLORS[s].border}`,
                       background: selectedOrder.status === s ? STATUS_COLORS[s].bg : 'white',
                       color: STATUS_COLORS[s].color,
-                      fontWeight:600,
-                      fontSize:13,
-                      cursor:'pointer',
-                      transition:'all 0.15s'
-                    }}>
-                    {s}
-                  </button>
+                      fontWeight:600, fontSize:13, cursor:'pointer'
+                    }}>{s}</button>
                 ))}
               </div>
             </div>
-
             <div style={{background:'#f8fafc', borderRadius:10, padding:16, marginBottom:16}}>
               <p style={{fontSize:12, color:'#64748b', marginBottom:8, fontWeight:600}}>ITEMS</p>
               {(selectedOrder.items || []).map((item, i) => (
@@ -183,7 +174,6 @@ export default function Orders() {
                 </div>
               ))}
             </div>
-
             <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 0'}}>
               <span style={{fontWeight:600, fontSize:15}}>Total Amount</span>
               <span style={{fontWeight:700, fontSize:22, color:'#0f172a'}}>₹{selectedOrder.total_amount}</span>
@@ -195,12 +185,20 @@ export default function Orders() {
       <div className="table-box">
         <div className="table-header">
           <h2>All Orders</h2>
-          <span className="table-count">{orders.length} orders</span>
+          <span className="table-count">{filtered.length} orders</span>
         </div>
-        {orders.length === 0 ? (
+        <div style={{padding:'12px 20px', borderBottom:'1px solid #f1f5f9'}}>
+          <input
+            placeholder="🔍 Search by customer name..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            style={{width:'100%', maxWidth:400, padding:'9px 14px', border:'1.5px solid #e2e8f0', borderRadius:8, fontSize:14, background:'#f8fafc'}}
+          />
+        </div>
+        {filtered.length === 0 ? (
           <div className="empty">
             <div className="empty-icon">🛒</div>
-            <p>No orders yet. Create your first order above!</p>
+            <p>{search ? 'No orders match your search' : 'No orders yet. Create your first order above!'}</p>
           </div>
         ) : (
           <table>
@@ -215,7 +213,7 @@ export default function Orders() {
               </tr>
             </thead>
             <tbody>
-              {orders.map(o => {
+              {filtered.map(o => {
                 const s = o.status || 'Pending';
                 const sc = STATUS_COLORS[s] || STATUS_COLORS.Pending;
                 return (
@@ -225,13 +223,10 @@ export default function Orders() {
                     <td><strong>₹{o.total_amount}</strong></td>
                     <td>
                       <span style={{
-                        background: sc.bg,
-                        color: sc.color,
+                        background: sc.bg, color: sc.color,
                         border: `1px solid ${sc.border}`,
-                        padding:'3px 10px',
-                        borderRadius:20,
-                        fontSize:12,
-                        fontWeight:600
+                        padding:'3px 10px', borderRadius:20,
+                        fontSize:12, fontWeight:600
                       }}>{s}</span>
                     </td>
                     <td>{new Date(o.created_at).toLocaleDateString('en-IN')}</td>
