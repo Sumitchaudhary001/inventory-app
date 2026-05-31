@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import os
@@ -18,3 +18,8 @@ def get_db():
         yield db
     finally:
         db.close()
+
+def run_migrations():
+    with engine.connect() as conn:
+        conn.execute(text("ALTER TABLE orders ADD COLUMN IF NOT EXISTS status VARCHAR DEFAULT 'Pending'"))
+        conn.commit()

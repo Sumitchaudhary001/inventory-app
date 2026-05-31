@@ -12,6 +12,8 @@ def wait_for_db():
     while retries > 0:
         try:
             models.Base.metadata.create_all(bind=engine)
+            from database import run_migrations
+            run_migrations()
             print("Database connected!")
             return
         except Exception as e:
