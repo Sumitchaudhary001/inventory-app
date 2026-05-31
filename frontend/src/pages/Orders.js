@@ -1,6 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import API from '../api';
 
+const exportCSV = (orders, getCustomerName) => {
+  const headers = ['Order ID', 'Customer', 'Total Amount', 'Status', 'Date'];
+  const rows = orders.map(o => [
+    `#${o.id}`,
+    getCustomerName(o.customer_id),
+    `₹${o.total_amount}`,
+    o.status || 'Pending',
+    new Date(o.created_at).toLocaleDateString('en-IN')
+  ]);
+  const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'orders.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
 const STATUS_COLORS = {
   Pending:   { bg: '#fff7ed', color: '#c2410c', border: '#fed7aa' },
   Confirmed: { bg: '#eff6ff', color: '#1d4ed8', border: '#bfdbfe' },
@@ -135,7 +154,6 @@ export default function Orders() {
         </div>
       </div>
 
-      {/* Order Details Modal */}
       {selectedOrder && (
         <div style={{position:'fixed', top:0, left:0, right:0, bottom:0, background:'rgba(0,0,0,0.5)', zIndex:200, display:'flex', alignItems:'center', justifyContent:'center'}}
           onClick={() => setSelectedOrder(null)}>
@@ -185,7 +203,14 @@ export default function Orders() {
       <div className="table-box">
         <div className="table-header">
           <h2>All Orders</h2>
-          <span className="table-count">{filtered.length} orders</span>
+          <div style={{display:'flex', gap:8, alignItems:'center'}}>
+            <span className="table-count">{filtered.length} orders</span>
+            <button
+              onClick={() => exportCSV(filtered, getCustomerName)}
+              style={{background:'#f1f5f9', color:'#0f172a', border:'none', padding:'6px 14px', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer', display:'flex', alignItems:'center', gap:6}}>
+              ⬇️ Export CSV
+            </button>
+          </div>
         </div>
         <div style={{padding:'12px 20px', borderBottom:'1px solid #f1f5f9'}}>
           <input
