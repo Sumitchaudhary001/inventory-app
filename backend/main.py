@@ -215,6 +215,7 @@ def dashboard(db: Session = Depends(get_db)):
             "id": o.id,
             "customer_name": customer.full_name if customer else "Unknown",
             "total_amount": o.total_amount,
+            "status": o.status or "Pending",
             "created_at": o.created_at
         })
     return {

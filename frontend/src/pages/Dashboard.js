@@ -95,7 +95,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Recent Orders */}
+{/* Recent Orders */}
         <div className="dash-box">
           <div className="dash-box-title">RECENT ORDERS</div>
           <div className="dash-box-content">
@@ -105,15 +105,28 @@ export default function Dashboard() {
                 <p style={{fontSize:13}}>No orders yet</p>
               </div>
             ) : (
-              recentOrders.map(o => (
-                <div key={o.id} className="dash-row">
-                  <div>
-                    <p style={{fontSize:13, fontWeight:600, color:'#0f172a'}}>{o.customer_name}</p>
-                    <p style={{fontSize:11, color:'#94a3b8'}}>Order #{o.id} · {new Date(o.created_at).toLocaleDateString('en-IN')}</p>
+              recentOrders.map(o => {
+                const STATUS_COLORS = {
+                  Pending:   { bg: '#fff7ed', color: '#c2410c' },
+                  Confirmed: { bg: '#eff6ff', color: '#1d4ed8' },
+                  Shipped:   { bg: '#f0fdf4', color: '#15803d' },
+                  Delivered: { bg: '#f0fdf4', color: '#166534' },
+                };
+                const s = o.status || 'Pending';
+                const sc = STATUS_COLORS[s] || STATUS_COLORS.Pending;
+                return (
+                  <div key={o.id} className="dash-row">
+                    <div>
+                      <p style={{fontSize:13, fontWeight:600, color:'#0f172a'}}>{o.customer_name}</p>
+                      <p style={{fontSize:11, color:'#94a3b8'}}>Order #{o.id} · {new Date(o.created_at).toLocaleDateString('en-IN')}</p>
+                    </div>
+                    <div style={{display:'flex', flexDirection:'column', alignItems:'flex-end', gap:4}}>
+                      <span style={{fontSize:14, fontWeight:700, color:'#10b981'}}>₹{o.total_amount}</span>
+                      <span style={{fontSize:11, fontWeight:600, padding:'2px 8px', borderRadius:20, background:sc.bg, color:sc.color}}>{s}</span>
+                    </div>
                   </div>
-                  <span style={{fontSize:14, fontWeight:700, color:'#10b981'}}>₹{o.total_amount}</span>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </div>
