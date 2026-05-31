@@ -122,6 +122,10 @@ def delete_customer(id: int, db: Session = Depends(get_db)):
     customer = db.query(models.Customer).filter(models.Customer.id == id).first()
     if not customer:
         raise HTTPException(404, "Customer not found")
+    orders = db.query(models.Order).filter(models.Order.customer_id == id).all()
+    for order in orders:
+        db.query(models.OrderItem).filter(models.OrderItem.order_id == order.id).delete()
+        db.delete(order)
     db.delete(customer)
     db.commit()
     return {"message": "Deleted"}
@@ -171,6 +175,7 @@ def delete_order(id: int, db: Session = Depends(get_db)):
     order = db.query(models.Order).filter(models.Order.id == id).first()
     if not order:
         raise HTTPException(404, "Order not found")
+    db.query(models.OrderItem).filter(models.OrderItem.order_id == id).delete()
     db.delete(order)
     db.commit()
     return {"message": "Deleted"}

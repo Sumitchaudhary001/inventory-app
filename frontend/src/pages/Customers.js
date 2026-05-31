@@ -26,9 +26,17 @@ export default function Customers() {
     }
   };
 
-  const del = async (id) => {
-    await API.delete(`/customers/${id}`);
-    load();
+const del = async (id) => {
+    const customer = customers.find(c => c.id === id);
+    if (window.confirm(`Delete ${customer.full_name}? This will also delete all their orders.`)) {
+      try {
+        await API.delete(`/customers/${id}`);
+        setMsg({ type: 'success', text: '✅ Customer deleted successfully!' });
+        load();
+      } catch (e) {
+        setMsg({ type: 'error', text: '❌ ' + (e.response?.data?.detail || 'Error deleting customer') });
+      }
+    }
   };
 
   return (
