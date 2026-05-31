@@ -16,9 +16,10 @@ export default function Dashboard() {
     </div>
   );
 
-  const maxStock = data.top_stocked_products.length > 0
-    ? Math.max(...data.top_stocked_products.map(p => p.quantity))
-    : 1;
+  const topStocked = data.top_stocked_products || [];
+  const recentOrders = data.recent_orders || [];
+  const lowStock = data.low_stock_products || [];
+  const maxStock = topStocked.length > 0 ? Math.max(...topStocked.map(p => p.quantity)) : 1;
 
   return (
     <div>
@@ -29,19 +30,19 @@ export default function Dashboard() {
       <p style={{fontSize:11, fontWeight:700, textTransform:'uppercase', letterSpacing:1, color:'#94a3b8', marginBottom:12}}>SALES ACTIVITY</p>
       <div className="activity-cards">
         <div className="activity-card">
-          <div className="ac-number ac-blue">{data.total_orders}</div>
+          <div className="ac-number ac-blue">{data.total_orders || 0}</div>
           <div className="ac-label"><ShoppingCart size={14}/> Total Orders</div>
         </div>
         <div className="activity-card">
-          <div className="ac-number ac-orange">{data.low_stock_products.length}</div>
+          <div className="ac-number ac-orange">{lowStock.length}</div>
           <div className="ac-label"><AlertTriangle size={14}/> Low Stock Items</div>
         </div>
         <div className="activity-card">
-          <div className="ac-number ac-green">{data.total_products}</div>
+          <div className="ac-number ac-green">{data.total_products || 0}</div>
           <div className="ac-label"><Package size={14}/> Total Products</div>
         </div>
         <div className="activity-card">
-          <div className="ac-number ac-purple">{data.total_customers}</div>
+          <div className="ac-number ac-purple">{data.total_customers || 0}</div>
           <div className="ac-label"><Users size={14}/> Total Customers</div>
         </div>
       </div>
@@ -52,7 +53,7 @@ export default function Dashboard() {
           <div className="sales-banner-icon"><IndianRupee size={24} color="white"/></div>
           <div>
             <p className="sales-banner-label">Total Revenue Generated</p>
-            <p className="sales-banner-value">₹{data.total_sales.toFixed(2)}</p>
+            <p className="sales-banner-value">₹{(data.total_sales || 0).toFixed(2)}</p>
           </div>
         </div>
         <div className="sales-banner-right">
@@ -60,20 +61,20 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Grid */}
+      {/* Dashboard Grid */}
       <div className="dashboard-grid">
 
         {/* Top Stocked Products */}
         <div className="dash-box">
           <div className="dash-box-title">TOP STOCKED PRODUCTS</div>
           <div className="dash-box-content">
-            {data.top_stocked_products.length === 0 ? (
+            {topStocked.length === 0 ? (
               <div style={{textAlign:'center', padding:'20px 0', color:'#94a3b8'}}>
                 <Package size={32} style={{marginBottom:8}}/>
                 <p style={{fontSize:13}}>No products yet</p>
               </div>
             ) : (
-              data.top_stocked_products.map(p => (
+              topStocked.map(p => (
                 <div key={p.id} style={{marginBottom:14}}>
                   <div style={{display:'flex', justifyContent:'space-between', marginBottom:5}}>
                     <span style={{fontSize:13, fontWeight:500, color:'#374151'}}>{p.name}</span>
@@ -83,7 +84,7 @@ export default function Dashboard() {
                     <div style={{
                       height:'100%',
                       borderRadius:999,
-                      background: p.quantity < 5 ? '#e53e3e' : '#10b981',
+                      background: p.quantity < 5 ? '#e53e3e' : '#2563eb',
                       width: `${Math.max((p.quantity / maxStock) * 100, 4)}%`,
                       transition:'width 0.6s ease'
                     }}/>
@@ -98,13 +99,13 @@ export default function Dashboard() {
         <div className="dash-box">
           <div className="dash-box-title">RECENT ORDERS</div>
           <div className="dash-box-content">
-            {data.recent_orders.length === 0 ? (
+            {recentOrders.length === 0 ? (
               <div style={{textAlign:'center', padding:'20px 0', color:'#94a3b8'}}>
                 <ShoppingCart size={32} style={{marginBottom:8}}/>
                 <p style={{fontSize:13}}>No orders yet</p>
               </div>
             ) : (
-              data.recent_orders.map(o => (
+              recentOrders.map(o => (
                 <div key={o.id} className="dash-row">
                   <div>
                     <p style={{fontSize:13, fontWeight:600, color:'#0f172a'}}>{o.customer_name}</p>
@@ -123,23 +124,23 @@ export default function Dashboard() {
           <div className="dash-box-content">
             <div className="dash-row">
               <span className="dash-row-label">Total Products</span>
-              <span className="dash-row-value green">{data.total_products}</span>
+              <span className="dash-row-value green">{data.total_products || 0}</span>
             </div>
             <div className="dash-row">
               <span className="dash-row-label">Low Stock Items</span>
-              <span className="dash-row-value red">{data.low_stock_products.length}</span>
+              <span className="dash-row-value red">{lowStock.length}</span>
             </div>
             <div className="dash-row">
               <span className="dash-row-label">Total Customers</span>
-              <span className="dash-row-value green">{data.total_customers}</span>
+              <span className="dash-row-value green">{data.total_customers || 0}</span>
             </div>
             <div className="dash-row">
               <span className="dash-row-label">Total Orders</span>
-              <span className="dash-row-value green">{data.total_orders}</span>
+              <span className="dash-row-value green">{data.total_orders || 0}</span>
             </div>
             <div className="dash-row">
               <span className="dash-row-label">Total Revenue</span>
-              <span className="dash-row-value green">₹{data.total_sales?.toFixed(2)}</span>
+              <span className="dash-row-value green">₹{(data.total_sales || 0).toFixed(2)}</span>
             </div>
           </div>
         </div>
@@ -148,13 +149,13 @@ export default function Dashboard() {
         <div className="dash-box">
           <div className="dash-box-title">LOW STOCK ALERT</div>
           <div className="dash-box-content">
-            {data.low_stock_products.length === 0 ? (
+            {lowStock.length === 0 ? (
               <div style={{textAlign:'center', padding:'20px 0', color:'#10b981'}}>
                 <TrendingUp size={32} style={{marginBottom:8}}/>
                 <p style={{fontSize:13}}>All products well stocked!</p>
               </div>
             ) : (
-              data.low_stock_products.map(p => (
+              lowStock.map(p => (
                 <div key={p.id} className="dash-row">
                   <span className="dash-row-label">{p.name}</span>
                   <span className="dash-row-value red">{p.quantity} left</span>
